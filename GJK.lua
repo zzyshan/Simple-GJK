@@ -26,7 +26,16 @@ function GJK.support(shape1, shape2, direction)
 end
 
 function GJK.collisions(shape1, shape2)
-    local direction = {x = 1, y = 0} -- 初始方向
+    local direction = {
+        x = shape2.x - shape1.x,
+        y = shape2.y - shape1.y
+    } -- 初始方向
+    
+    if direction.x == 0 and direction.y == 0 then
+        -- 如果为重合,则使用默认方向
+        direction.x = 1
+    end
+    
     local simplex = { GJK.support(shape1, shape2, direction) }
     direction = {x = -simplex[1].x, y = -simplex[1].y} -- 支撑点指向原点的方向
     

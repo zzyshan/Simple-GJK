@@ -213,7 +213,7 @@ function shapes.Polygon:isConvex(vertexs)
 end
 
 function shapes.Polygon:getCentroid(polygon)
-    if self.type ~= "rectangle" then return end
+    if self.type == "rectangle" then return end
     local polygon = polygon or self:unpack()
     local triangles = love.math.triangulate(polygon)
     local total_area = 0

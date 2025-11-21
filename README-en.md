@@ -22,7 +22,7 @@ Currently supports **convex polygons and circles**.<br>
 -- Demonstration using LÖVE
 local lg = love.graphics
 
-gjk = require("GJK")
+gjk = require("SimplyGJK")
 
 -- Create various shapes
 local Rectangle1 = gjk.Rectangle({100, 100}, 20, 90)

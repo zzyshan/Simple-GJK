@@ -22,7 +22,7 @@
 -- 使用Love进行演示
 local lg = love.graphics
 
-gjk = require("GJK")
+gjk = require("SimplyGJK")
 
 -- 创建各种形状
 local Rectangle1 = gjk.Rectangle({100, 100}, 20, 90)
