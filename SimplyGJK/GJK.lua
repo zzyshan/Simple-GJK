@@ -1,19 +1,6 @@
 local GJK = {}
 
--- 点积
-local function dot(point, direction)
-    return point.x * direction.x + point.y * direction.y
-end
-
--- 三重积
-local function tripleProduct(a, b, c)
-    local ac = a.x * c.x + a.y * c.y  -- a·c
-    local bc = b.x * c.x + b.y * c.y  -- b·c
-    return {
-        x = b.x * ac - a.x * bc,
-        y = b.y * ac - a.y * bc
-    }
-end
+local mathlib = package.loaded["SimplyGJK/_info"].search("mathlib")
 
 function GJK.support(shape1, shape2, direction)
     local point1 = shape1:support(direction)
@@ -25,7 +12,29 @@ function GJK.support(shape1, shape2, direction)
     }
 end
 
-function GJK.collisions(shape1, shape2)
+function GJK.check(shape1, shape2)
+    if shape1.colliders or shape2.colliders then
+        local collider1 = shape1.colliders and #shape1.colliders or 1
+        local collider2 = shape2.colliders and #shape2.colliders or 1
+        
+        for i = 1, collider1 do
+            local shape_1 = collider1 == 1 and shape1 or shape1.colliders[i]
+            for j = 1, collider2 do
+                local shape_2 = collider2 == 1 and shape2 or shape2.colliders[j]
+                
+                if GJK.collisions(shape_1, shape_2) then
+                    return true
+                end
+            end
+        end
+        
+        return false
+    end
+    
+    return GJK.collisions(shape1, shape2)
+end
+
+function GJK.collisions(shape1, shape2)    
     local direction = {
         x = shape2.x - shape1.x,
         y = shape2.y - shape1.y
@@ -42,21 +51,21 @@ function GJK.collisions(shape1, shape2)
     while true do
         local point = GJK.support(shape1, shape2, direction)
         
-        if dot(point, direction) < 0 then
+        if mathlib.dot(point, direction) < 0 then
             return false -- 如果没有更远的点,无法碰撞
         end
         
         -- 添加点
         table.insert(simplex, point)
         
-        if GJK.handleSimplex(simplex, direction) then
+        if GJK.handle_simplex(simplex, direction) then
             return true
         end
     end
 end
 
 -- 处理单纯型
-function GJK.handleSimplex(simplex, direction)
+function GJK.handle_simplex(simplex, direction)
     local a = simplex[#simplex]  -- 最新点
     local b = simplex[#simplex-1] or a
     local ao = {x = -a.x, y = -a.y} -- a点指向原点的方向
@@ -65,7 +74,7 @@ function GJK.handleSimplex(simplex, direction)
         -- 处理线情况
         local ab = {x = b.x - a.x, y = b.y - a.y}
         -- 使用三重积确定下个方向
-        local abPerp = tripleProduct(ab, ao, ab)
+        local abPerp = mathlib.triple_product(ab, ao, ab)
         
         direction.x, direction.y = abPerp.x, abPerp.y
         return false
@@ -76,14 +85,14 @@ function GJK.handleSimplex(simplex, direction)
         local ab = {x = b.x - a.x, y = b.y - a.y}
         local ac = {x = c.x - a.x, y = c.y - a.y}
         
-        local abPerp = tripleProduct(ac, ab, ab)
-        local acPerp = tripleProduct(ab, ac, ac)
+        local abPerp = mathlib.triple_product(ac, ab, ab)
+        local acPerp = mathlib.triple_product(ab, ac, ac)
         
-        if dot(abPerp, ao) > 0 then
+        if mathlib.dot(abPerp, ao) > 0 then
             table.remove(simplex, 1) --删除c点
             direction.x, direction.y = abPerp.x, abPerp.y
             return false
-        elseif dot(acPerp, ao) > 0 then
+        elseif mathlib.dot(acPerp, ao) > 0 then
             table.remove(simplex, 2) --删除b点
             direction.x, direction.y = acPerp.x, acPerp.y
             return false

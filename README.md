@@ -13,41 +13,41 @@
 
 ## 兼容形状
 
-目前兼容 **凸边形与圆形**。<br>
-**之后会进行凹边形与椭圆等其他形状的兼容。**
+目前已兼容 **多边形与圆形** (包括凹边形)。<br>
+**之后应该会对其他图形进行兼容？**
 
 ## 快速开始
 
 ```lua
--- 使用Love进行演示
+-- 使用Love2d进行演示
 local lg = love.graphics
 
 gjk = require("SimplyGJK")
 
 -- 创建各种形状
-local Rectangle1 = gjk.Rectangle({100, 100}, 20, 90)
-local Rectangle2 = gjk.Rectangle({150, 100}, 20, 60)
-local Polygon = gjk.Polygon({250, 100, 240, 130, 250, 180, 300, 70})
-local circle = gjk.Circle({400, 100}, 60)
+local rectangle1 = gjk.rectangle({100, 100}, 20, 90)
+local Rectangle2 = gjk.rectangle({150, 100}, 20, 60)
+local polygon = gjk.polygon({250, 100, 240, 130, 250, 180, 300, 70})
+local circle = gjk.circle({400, 100}, 60)
 
 -- 设置旋转角度
-Rectangle1:setAngle(30)
+rectangle1:set_angle(30)
 
 function love.update(dt)
     -- 更新对象位置和旋转
-    Rectangle1:MoveTo(love.mouse.getPosition())
-    Rectangle2:rotate(1)
+    rectangle1:move_to(love.mouse.getPosition())
+    rectangle2:rotate(1)
     
     -- 碰撞检测
-    local collision1 = gjk.collisions(Rectangle1, Rectangle2)  -- 矩形vs矩形
-    local collision2 = gjk.collisions(Rectangle1, Polygon)     -- 矩形vs多边形
-    local collision3 = gjk.collisions(Rectangle1, circle)      -- 矩形vs圆形
+    local collision1 = gjk.check(rectangle1, rectangle2)  -- 矩形vs矩形
+    local collision2 = gjk.check(rectangle1, polygon)     -- 矩形vs多边形
+    local collision3 = gjk.check(rectangle1, circle)      -- 矩形vs圆形
 end
 
 function love.draw()
     -- 渲染所有形状
-    love.graphics.circle("fill", circle.x, circle.y, circle.radius)
-    love.graphics.polygon("fill", Polygon:unpack())
+    circle:draw()
+    polygon:draw()
     -- ... 更多渲染代码
 end
 ```
@@ -74,4 +74,4 @@ end
 ## 许可证
 
 本项目采用 Mozilla Public License Version 2.0 许可证 - 详见 [LICENSE](LICENSE) 文件。<br>
-**所以如果你使用到此库,分发时应记得将其开源(保留开源协议公布出来)**
+**所以如果你使用或修改此库，分发时应记得将其源代码公开(仅需这个库)**
